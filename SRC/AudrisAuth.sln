@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudrisAuth.Core", "AudrisAuth.Core\AudrisAuth.Core.csproj", "{064D6ABD-756F-4D8C-A5CA-5D0719733B0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudrisAuth.Core", "AudrisAuth.Core\AudrisAuth.Core.csproj", "{064D6ABD-756F-4D8C-A5CA-5D0719733B0F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4C6EDECF-5D51-48B0-8F15-61EEB97E3A2B}"
+	ProjectSection(SolutionItems) = preProject
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
