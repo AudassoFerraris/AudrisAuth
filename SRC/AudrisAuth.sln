@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudrisAuth.Core.Tests", "AudrisAuth.Core.Tests\AudrisAuth.Core.Tests.csproj", "{EC5C1B6F-3C48-4C91-8F83-DDFF58D44B1B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{064D6ABD-756F-4D8C-A5CA-5D0719733B0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{064D6ABD-756F-4D8C-A5CA-5D0719733B0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{064D6ABD-756F-4D8C-A5CA-5D0719733B0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC5C1B6F-3C48-4C91-8F83-DDFF58D44B1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC5C1B6F-3C48-4C91-8F83-DDFF58D44B1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC5C1B6F-3C48-4C91-8F83-DDFF58D44B1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC5C1B6F-3C48-4C91-8F83-DDFF58D44B1B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

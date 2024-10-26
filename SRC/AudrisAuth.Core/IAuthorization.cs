@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace AudrisAuth
 {
@@ -6,7 +7,7 @@ namespace AudrisAuth
     /// Main interface for authorization
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IAuthorize<T>
+    public interface IAuthorization<T>
     {
         /// <summary>
         /// Check if user can perform a generic action
@@ -15,6 +16,7 @@ namespace AudrisAuth
         /// <param name="user"></param>
         /// <param name="action"></param>
         /// <returns></returns>
+        /// <exception cref="NotRecognizedActionException"></exception>"
         bool Can(ClaimsPrincipal user, string action);
 
         /// <summary>
@@ -25,6 +27,13 @@ namespace AudrisAuth
         /// <param name="resource"></param>
         /// <param name="action"></param>
         /// <returns></returns>
+        /// <exception cref="NotRecognizedActionException"></exception>"
         bool Can(ClaimsPrincipal user, T resource, string action);
+
+        /// <summary>
+        /// Returns the list of available actions for the resource type T
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<AuthorizationAction> GetAvailableActions();
     }
 }
