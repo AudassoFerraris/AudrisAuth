@@ -1,5 +1,8 @@
-﻿using System;
+﻿using DynamicExpresso;
+
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq.Expressions;
 using System.Security.Claims;
 
@@ -18,9 +21,15 @@ namespace AudrisAuth
         protected Dictionary<string, InstanceAuthorizationRule<T>> _instanceActions = new Dictionary<string, InstanceAuthorizationRule<T>>();
         protected Dictionary<string, AuthorizationAction> _availableActions = new Dictionary<string, AuthorizationAction>();
 
+        protected readonly AuthorizationRuleParser<T> _ruleParser;
+
         public DefaultAuthorization()
         {
+            _ruleParser = new AuthorizationRuleParser<T>();
+            Initialize();
         }
+
+        protected abstract void Initialize();
 
         public bool Can(ClaimsPrincipal user, string action)
         {
@@ -97,5 +106,6 @@ namespace AudrisAuth
         {
             return _availableActions.Values;
         }
+
     }
 }

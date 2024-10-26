@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,9 +20,16 @@ public class SampleClassAuthorizationTests
 
     private ClaimsPrincipal CreateUserWithRoles(params string[] roles)
     {
-        var claims = roles.Select(role => new Claim(ClaimTypes.Role, role)).ToList();
+        var claims = roles.Select(role => new Claim(ClaimTypes.Role, role)).ToList();        
         var identity = new ClaimsIdentity(claims, "TestAuthType");
         return new ClaimsPrincipal(identity);
+    }
+
+    private ClaimsPrincipal CreateUserWithRoles(IIdentity identity, params string[] roles)
+    {
+        var claims = roles.Select(role => new Claim(ClaimTypes.Role, role)).ToList();
+        var claimsIdentity = new ClaimsIdentity(identity, claims);
+        return new ClaimsPrincipal(claimsIdentity);
     }
 
     [Fact]
@@ -138,6 +146,20 @@ public class SampleClassAuthorizationTests
 
         // Act & Assert
         Assert.Throws<NotRecognizedActionException>(() => _authorization.Can(user, unrecognizedAction));
+    }
+
+    [Fact]
+    public void Can_StartMaintenance_With_InstanceAction_Should_Return_True_For_Maintainer()
+    {
+        // Arrange
+        var identity = new GenericIdentity("Luigi");
+        var user = CreateUserWithRoles(identity);
+
+        // Act
+        var canStartMaintenance = _authorization.Can(user, _sampleResource, SampleClassAuthorization.Actions.StartMaintenance.Name);
+
+        // Assert
+        Assert.True(canStartMaintenance);
     }
 
     [Fact]

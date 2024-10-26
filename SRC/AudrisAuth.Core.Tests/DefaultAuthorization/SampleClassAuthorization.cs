@@ -1,4 +1,7 @@
-﻿namespace AudrisAuth.Core.Tests.DefaultAuthorization;
+﻿using System.Linq.Expressions;
+using System.Security.Claims;
+
+namespace AudrisAuth.Core.Tests.DefaultAuthorization;
 public class SampleClassAuthorization : DefaultAuthorization<SampleClass>
 {
     public SampleClassAuthorization()
@@ -8,18 +11,20 @@ public class SampleClassAuthorization : DefaultAuthorization<SampleClass>
             { Actions.Read.Name, Actions.Read },
             { Actions.Insert.Name, Actions.Insert },
             { Actions.Edit.Name, Actions.Edit },
-            { Actions.Delete.Name, Actions.Delete }
+            { Actions.Delete.Name, Actions.Delete },
+            { Actions.StartMaintenance.Name, Actions.StartMaintenance }
         };
-        _genericActions = new Dictionary<string, GenericAuthorizationRule>
-        {
-            { Actions.Read.Name, new GenericAuthorizationRule(user => true) },
-            { Actions.Insert.Name, new GenericAuthorizationRule(user => user.IsInRole("Manager")) }
-        };
-        _instanceActions = new Dictionary<string, InstanceAuthorizationRule<SampleClass>>
-        {
-            { Actions.Edit.Name, new InstanceAuthorizationRule<SampleClass>((user, resource) => user.IsInRole("Manager") || user.IsInRole("Admin")) },
-            { Actions.Delete.Name, new InstanceAuthorizationRule<SampleClass>((user, resource) => user.IsInRole("Admin")) }
-        };
+        
+    }
+
+    protected override void Initialize()
+    {
+        _genericActions.Add(Actions.Read.Name, _ruleParser.ParseGenericRule("true"));
+        _genericActions.Add(Actions.Insert.Name, _ruleParser.ParseGenericRule("IsInRole(user, \"Manager\")"));
+
+        _instanceActions.Add(Actions.Edit.Name, _ruleParser.ParseInstanceRule("IsInRole(user, \"Manager\") || IsInRole(user, \"Admin\")"));
+        _instanceActions.Add(Actions.Delete.Name, _ruleParser.ParseInstanceRule("IsInRole(user, \"Admin\")"));
+        _instanceActions.Add(Actions.StartMaintenance.Name, _ruleParser.ParseInstanceRule("item.IsMantainer(user.Identity.Name)"));
     }
 
     public static class Actions
@@ -31,5 +36,7 @@ public class SampleClassAuthorization : DefaultAuthorization<SampleClass>
         public static readonly AuthorizationAction Edit = new(nameof(Edit), isInstanceAction: true);
 
         public static readonly AuthorizationAction Delete = new(nameof(Delete), isInstanceAction: true);
+
+        public static readonly AuthorizationAction StartMaintenance = new(nameof(StartMaintenance), isInstanceAction: true);
     }
 }
