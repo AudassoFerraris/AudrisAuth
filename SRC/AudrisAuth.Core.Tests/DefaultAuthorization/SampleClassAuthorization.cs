@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AudrisAuth.Core.Tests.DefaultAuthorization;
+﻿namespace AudrisAuth.Core.Tests.DefaultAuthorization;
 public class SampleClassAuthorization : DefaultAuthorization<SampleClass>
 {
     public SampleClassAuthorization()
@@ -30,12 +24,12 @@ public class SampleClassAuthorization : DefaultAuthorization<SampleClass>
 
     public static class Actions
     {
-        public static AuthorizationAction Read = new AuthorizationAction(nameof(Read));
+        public static readonly AuthorizationAction Read = new(nameof(Read));
 
-        public static AuthorizationAction Insert = new AuthorizationAction(nameof(Insert));
+        public static readonly AuthorizationAction Insert = new(nameof(Insert));
 
-        public static AuthorizationAction Edit = new AuthorizationAction(nameof(Edit), isInstanceAction: true);
+        public static readonly AuthorizationAction Edit = new(nameof(Edit), isInstanceAction: true);
 
-        public static AuthorizationAction Delete = new AuthorizationAction(nameof(Delete), isInstanceAction: true);
+        public static readonly AuthorizationAction Delete = new(nameof(Delete), isInstanceAction: true);
     }
 }
