@@ -3,8 +3,8 @@ name: Publish NuGet Package
 on:
   push:
     tags:
-      - 'v*.*.*'      # Cattura tag come v1.0.0
-      - 'v*.*.*-*'    # Cattura tag come v1.0.0-beta
+      - 'v*.*.*'
+      - 'v*.*.*-*'
 
 jobs:
   publish:
@@ -16,7 +16,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '6.0.x' # Sostituisci con la versione appropriata per il tuo progetto
+          dotnet-version: '6.0.x'
 
       - name: Cache NuGet packages
         uses: actions/cache@v3
@@ -41,8 +41,10 @@ jobs:
         working-directory: SRC
 
       - name: Pack
-        run: dotnet pack --no-build --configuration Release /p:PackageVersion=${{ steps.vars.outputs.VERSION }} /p:Version=${{ steps.vars.outputs.VERSION }}
+        run: dotnet pack --no-build --configuration Release --include-symbols --include-source /p:PackageVersion=${{ steps.vars.outputs.VERSION }} /p:Version=${{ steps.vars.outputs.VERSION }}
         working-directory: SRC
 
       - name: Publish to NuGet
-        run: dotnet nuget push SRC/**/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        run: |
+          dotnet nuget push SRC/**/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          dotnet nuget push SRC/**/bin/Release/*.snupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate

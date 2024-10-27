@@ -6,7 +6,7 @@ An extensible and flexible authorization library for .NET applications, allowing
 
 ## Status
 
-**Current Version**: `1.0.0-beta`
+**Current Version**: `1.0.2-beta`
 
 ⚠️ This library is currently in Beta. APIs may change, and backward compatibility is not guaranteed. Feedback is welcome!
 
