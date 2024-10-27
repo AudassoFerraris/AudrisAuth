@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using AudrisAuth.Exceptions;
 
@@ -30,6 +32,16 @@ namespace AudrisAuth
         /// <returns></returns>
         /// <exception cref="NotRecognizedActionException"></exception>
         bool Can(ClaimsPrincipal user, T resource, string action);
+
+
+        /// <summary>
+        /// Returns an expression that can be used to filter IQueryable
+        /// lists of resource type T.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="actionName"></param>
+        /// <returns></returns>
+        Expression<Func<T, bool>> GetAuthorizationExpression(ClaimsPrincipal user, string actionName);
 
         /// <summary>
         /// Returns the list of available actions for the resource type T

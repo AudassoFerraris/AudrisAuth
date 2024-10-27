@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Claims;
 
 using AudrisAuth.Exceptions;
@@ -140,19 +141,13 @@ namespace AudrisAuth
                 .SetVariable("UserRoles", userRoles)
                 .SetVariable("UserClaims", userClaims);
 
-            // Register functions
-            interpreter.SetFunction("HasRole", (Func<string, bool>)(role => userRoles.Contains(role)));
-            interpreter.SetFunction("HasClaim", (Func<string, string, bool>)((type, value) =>
-                userClaims.TryGetValue(type, out var values) && values.Contains(value)));
-
             ConfigureInterpreter(interpreter);
-
 
             return interpreter;
         }
 
         /// <summary>
-        /// Allow to configure the interpreter with custom functions
+        /// Allow to configure the interpreter with custom variables
         /// in the derived class
         /// </summary>
         /// <param name="interpreter"></param>
@@ -175,14 +170,13 @@ namespace AudrisAuth
         /// <summary>
         /// Function used to extract the claims from the user.
         /// Can be overridden in derived classes to extract the claims in a different way.
+        /// The claims are returned as a list of strings in the format "Type:Value".
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        protected virtual Dictionary<string, List<string>> GetClaims(ClaimsPrincipal user)
+        protected virtual List<string> GetClaims(ClaimsPrincipal user)
         {
-            return user.Claims
-                .GroupBy(c => c.Type)
-                .ToDictionary(g => g.Key, g => g.Select(c => c.Value).ToList());
+            return user.Claims.Select(c => $"{c.Type}:{c.Value}").ToList();
         }
 
         /// <summary>
@@ -234,6 +228,38 @@ namespace AudrisAuth
 
             var action = new AuthorizationAction(actionName, ruleText, isInstanceAction: true);
             _availableActions[actionName] = action;
+        }
+
+        /// <summary>
+        /// Returns an expression that can be used to filter IQueryable
+        /// list of resource type T.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="actionName"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public virtual Expression<Func<T, bool>> GetAuthorizationExpression(ClaimsPrincipal user, string actionName)
+        {
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentException("Action cannot be null or empty.", nameof(actionName));
+
+            if (!_availableActions.TryGetValue(actionName, out var actionInfo))
+                throw new NotRecognizedActionException(typeof(T), actionName);
+            // Initialize user variables
+            var interpreter = CreateInterpreter(user);
+
+            // Parse the rule into an expression
+            try
+            {
+                // Parse the expression
+                var parsedExpression = interpreter.ParseAsExpression<Func<T, bool>>(actionInfo.Rule, "Resource");
+
+                return parsedExpression;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Error parsing authorization rule into an expression.", ex);
+            }
         }
     }
 }

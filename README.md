@@ -1,12 +1,14 @@
 ﻿# AudrisAuth
 
+[![NuGet Version](https://img.shields.io/nuget/v/AudrisAuth.svg?style=flat)](https://www.nuget.org/packages/AudrisAuth/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://github.com/AudassoFerraris/AudrisAuth/actions/workflows/dotnet.yml/badge.svg)](https://github.com/AudassoFerraris/AudrisAuth/actions)
 
 An extensible and flexible authorization library for .NET applications, allowing you to define and evaluate authorization rules dynamically using expressions. AudrisAuth leverages [DynamicExpresso](https://github.com/davideicardi/DynamicExpresso) to parse and evaluate authorization rules defined as strings.
 
 ## Status
 
-**Current Version**: `1.0.2-beta`
+**Current Version**: `1.0.3-beta`
 
 ⚠️ This library is currently in Beta. APIs may change, and backward compatibility is not guaranteed. Feedback is welcome!
 
@@ -29,10 +31,11 @@ An extensible and flexible authorization library for .NET applications, allowing
 ## Features
 
 - **Dynamic Rule Evaluation**: Define authorization rules as strings and evaluate them at runtime.
-- **Extensibility**: Customize the authorization logic by overriding methods and adding custom functions.
+- **Extensibility**: Customize the authorization logic by overriding methods and adding custom variables.
 - **Support for Claims and Roles**: Utilize user roles and claims in your authorization rules.
 - **Instance and Generic Actions**: Define both instance-specific and generic actions.
-- **Compatibility with LINQ**: Retrieve expressions for use in LINQ queries (planned feature).
+- **Compatibility with LINQ**: Generate expressions to use in LINQ queries for efficient data filtering.
+
 
 ## Getting Started
 
@@ -70,11 +73,6 @@ Authorization rules are defined as strings using a simple expression language. Y
 - `UserClaims`: A dictionary of the user's claims (`Dictionary<string, List<string>>`).
 - `Resource`: The resource instance being accessed (available in instance actions).
 
-**Available Functions:**
-
-- `HasRole(string role)`: Returns `true` if the user has the specified role.
-- `HasClaim(string type, string value)`: Returns `true` if the user has a claim of the specified type and value.
-
 ### Implementing a Custom Authorization Class
 
 To create your custom authorization logic, derive a class from `DefaultAuthorization<T>`, where `T` is the type of the resource you are securing.
@@ -89,12 +87,12 @@ public class TeamAuthorization : DefaultAuthorization<Team>
     {
         // Define generic actions
         AddGenericRule("Read", "true");
-        AddGenericRule("Insert", "HasRole(\"Manager\")");
+        AddGenericRule("Insert", "UserRoles.Contains(\"Manager\")");
 
         // Define instance actions
-        AddInstanceRule("Edit", "HasRole(\"Manager\") || HasRole(\"Admin\")");
-        AddInstanceRule("Delete", "HasRole(\"Admin\")");
-        AddInstanceRule("StartTraining", "Resource.Coach.Name == UserId");
+        AddInstanceRule("Edit", "UserRoles.Contains(\"Manager\") || UserRoles.Contains(\"Admin\")");
+        AddInstanceRule("Delete", "UserRoles.Contains(\"Admin\")");
+        AddInstanceRule("StartTraining", "Resource.Coach.Name == UserId || UserClaims.Contains(\"TeamCoach:\"+Resource.Name)");
     }
 }
 ```
@@ -120,6 +118,20 @@ bool canRead = authorization.Can(user, "Read");
 // Check instance action
 var team = new Team { Name = "Black Bugs", Coach = new Person { Name = "Luigi" } };
 bool canEdit = authorization.Can(user, team, "Edit");
+```
+
+### Get an Expression to use in LINQ Queries
+
+You can retrieve the expression for a specific action to use in LINQ queries.
+
+```csharp
+var authExpression = authorization.GetAuthorizationExpression(user, "StartTraining");
+
+var teams = context.Teams
+    .Include(t => t.Coach)
+    .Where(authExpression)
+    .OrderBy(t => t.Name)
+    .ToList();
 ```
 
 ### Example
@@ -148,12 +160,14 @@ public class TeamAuthorization : DefaultAuthorization<Team>
 {
     public TeamAuthorization()
     {
+        // Define generic actions
         AddGenericRule("Read", "true");
-        AddGenericRule("Insert", "HasRole(\"Manager\")");
+        AddGenericRule("Insert", "UserRoles.Contains(\"Manager\")");
 
-        AddInstanceRule("Edit", "HasRole(\"Manager\") || HasRole(\"Admin\")");
-        AddInstanceRule("Delete", "HasRole(\"Admin\")");
-        AddInstanceRule("StartTraining", "Resource.Coach.Name == UserId");
+        // Define instance actions
+        AddInstanceRule("Edit", "UserRoles.Contains(\"Manager\") || UserRoles.Contains(\"Admin\")");
+        AddInstanceRule("Delete", "UserRoles.Contains(\"Admin\")");
+        AddInstanceRule("StartTraining", "Resource.Coach.Name == UserId || UserClaims.Contains(\"TeamCoach:\"+Resource.Name)");
     }
 }
 ```
@@ -197,7 +211,7 @@ if (authorization.Can(user, team, "StartTraining"))
 
 ### Extending the Interpreter
 
-You can extend the interpreter by overriding the `ConfigureInterpreter` method to add custom functions or variables.
+You can extend the interpreter by overriding the `ConfigureInterpreter` method to add variables.
 
 ```csharp
 protected override void ConfigureInterpreter(Interpreter interpreter)
@@ -205,7 +219,37 @@ protected override void ConfigureInterpreter(Interpreter interpreter)
     base.ConfigureInterpreter(interpreter);
 
     // Add a custom function
-    interpreter.SetFunction("IsInDepartment", (Func<string, bool>)(dept => UserDepartments.Contains(dept)));
+    interpreter.SetVariable("Context", myContextData);
+}
+```
+
+## Testing Authorization Rules
+
+It's important to test your authorization rules to ensure they behave as expected.
+
+**Example using xUnit:**
+
+```csharp
+public class TeamAuthorizationTests
+{
+    [Fact]
+    public void Manager_Can_Insert_Teams()
+    {
+        // Arrange
+        var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, "Alice"),
+            new Claim(ClaimTypes.Role, "Manager")
+        }, "TestAuthType"));
+
+        var authorization = new TeamAuthorization();
+
+        // Act
+        bool canInsert = authorization.Can(user, "Insert");
+
+        // Assert
+        Assert.True(canInsert);
+    }
 }
 ```
 
@@ -228,6 +272,11 @@ Contributions are welcome! Please open issues or submit pull requests for any ch
 3. Commit your changes (`git commit -am 'Add some feature'`).
 4. Push to the branch (`git push origin feature/YourFeature`).
 5. Open a pull request.
+
+## Support
+
+If you have any questions or need assistance, please open an issue on [GitHub](https://github.com/AudassoFerraris/AudrisAuth/issues).
+
 
 ## Acknowledgments
 

@@ -7,10 +7,10 @@
 
 
   <PropertyGroup>
-    <Version>1.0.2-beta</Version>
-    <PackageVersion>1.0.2-beta</PackageVersion>
-    <AssemblyVersion>1.0.2.0</AssemblyVersion>
-    <FileVersion>1.0.2.0</FileVersion>
+    <Version>1.0.3-beta</Version>
+    <PackageVersion>1.0.3-beta</PackageVersion>
+    <AssemblyVersion>1.0.3.0</AssemblyVersion>
+    <FileVersion>1.0.3.0</FileVersion>
     <Authors>Roberto Ferraris</Authors>
     <Copyright>Copyright © 2025 Audris snc</Copyright>
     <PackageId>AudrisAuth</PackageId>

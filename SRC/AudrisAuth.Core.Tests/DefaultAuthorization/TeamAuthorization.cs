@@ -5,10 +5,10 @@ public class TeamAuthorization : DefaultAuthorization<Team>
     {
         
         AddGenericRule(Actions.Read, "true");
-        AddGenericRule(Actions.Insert, "HasRole(\"Manager\")");
+        AddGenericRule(Actions.Insert, "UserRoles.Contains(\"Manager\")");
 
-        AddInstanceRule(Actions.Edit, "HasRole(\"Manager\") || HasRole(\"Admin\")");
-        AddInstanceRule(Actions.Delete, "HasRole(\"Admin\")");
+        AddInstanceRule(Actions.Edit, "UserRoles.Contains(\"Manager\") || UserRoles.Contains(\"Admin\")");
+        AddInstanceRule(Actions.Delete, "UserRoles.Contains(\"Admin\")");
         AddInstanceRule(Actions.StartTraining, "Resource.Coach.Name == UserId");
     }
 
