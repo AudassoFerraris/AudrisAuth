@@ -1,8 +1,14 @@
-# AudrisAuth
+﻿# AudrisAuth
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 An extensible and flexible authorization library for .NET applications, allowing you to define and evaluate authorization rules dynamically using expressions. AudrisAuth leverages [DynamicExpresso](https://github.com/davideicardi/DynamicExpresso) to parse and evaluate authorization rules defined as strings.
+
+## Status
+
+**Current Version**: `1.0.0-beta`
+
+⚠️ This library is currently in Beta. APIs may change, and backward compatibility is not guaranteed. Feedback is welcome!
 
 ## Table of Contents
 

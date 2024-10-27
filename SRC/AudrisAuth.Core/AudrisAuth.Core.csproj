@@ -5,6 +5,34 @@
     <RootNamespace>AudrisAuth</RootNamespace>
   </PropertyGroup>
 
+
+  <PropertyGroup>
+    <Version>1.0.0-beta</Version>
+    <PackageVersion>1.0.0-beta</PackageVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Authors>Roberto Ferraris</Authors>
+    <Copyright>Copyright © 2025 Audris snc</Copyright>
+    <PackageId>AudrisAuth</PackageId>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Company>Audris snc di Audasso Margherita e Ferraris Roberto</Company>
+    <Description>An extensible and flexible authorization library for .NET applications.</Description>
+    <PackageTags>authorization;dynamic;security</PackageTags>
+    <RepositoryUrl>https://github.com/AudassoFerraris/AudrisAuth</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/AudassoFerraris/AudrisAuth</PackageProjectUrl>
+    <LicenseType>MIT</LicenseType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <IncludeSource>true</IncludeSource>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="DynamicExpresso.Core" Version="2.16.1" />
   </ItemGroup>
