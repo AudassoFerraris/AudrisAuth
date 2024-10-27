@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Security.Claims;
+using AudrisAuth.Exceptions;
 
 namespace AudrisAuth
 {
@@ -16,7 +17,7 @@ namespace AudrisAuth
         /// <param name="user"></param>
         /// <param name="action"></param>
         /// <returns></returns>
-        /// <exception cref="NotRecognizedActionException"></exception>"
+        /// <exception cref="NotRecognizedActionException"></exception>
         bool Can(ClaimsPrincipal user, string action);
 
         /// <summary>
@@ -27,7 +28,7 @@ namespace AudrisAuth
         /// <param name="resource"></param>
         /// <param name="action"></param>
         /// <returns></returns>
-        /// <exception cref="NotRecognizedActionException"></exception>"
+        /// <exception cref="NotRecognizedActionException"></exception>
         bool Can(ClaimsPrincipal user, T resource, string action);
 
         /// <summary>

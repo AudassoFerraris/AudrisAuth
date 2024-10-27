@@ -1,21 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
+
+using AudrisAuth.Exceptions;
 
 namespace AudrisAuth.Core.Tests.DefaultAuthorization;
-public class SampleClassAuthorizationTests
+public class TeamAuthorizationTests
 {
-    private readonly SampleClassAuthorization _authorization;
-    private readonly SampleClass _sampleResource;
+    private readonly TeamAuthorization _authorization;
+    private readonly Team _sampleResource;
 
-    public SampleClassAuthorizationTests()
+    public TeamAuthorizationTests()
     {
-        _authorization = new SampleClassAuthorization();
-        _sampleResource = new SampleClass(); // Initialize as needed
+        _authorization = new TeamAuthorization();
+        _sampleResource = new Team
+        {
+            Name = "Black Bugs",
+            Coach = new Person { Name = "Luigi" }
+        };
     }
 
     private ClaimsPrincipal CreateUserWithRoles(params string[] roles)
@@ -25,11 +25,12 @@ public class SampleClassAuthorizationTests
         return new ClaimsPrincipal(identity);
     }
 
-    private ClaimsPrincipal CreateUserWithRoles(IIdentity identity, params string[] roles)
+    private ClaimsPrincipal CreateUserWithNameAndRoles(string name, params string[] roles)
     {
         var claims = roles.Select(role => new Claim(ClaimTypes.Role, role)).ToList();
-        var claimsIdentity = new ClaimsIdentity(identity, claims);
-        return new ClaimsPrincipal(claimsIdentity);
+        claims.Add(new Claim(ClaimTypes.NameIdentifier, name));
+        var identity = new ClaimsIdentity(claims, "TestAuthType");
+        return new ClaimsPrincipal(identity);
     }
 
     [Fact]
@@ -39,7 +40,7 @@ public class SampleClassAuthorizationTests
         var user = CreateUserWithRoles(); // User with no roles
 
         // Act
-        var canRead = _authorization.Can(user, SampleClassAuthorization.Actions.Read.Name);
+        var canRead = _authorization.Can(user, TeamAuthorization.Actions.Read);
 
         // Assert
         Assert.True(canRead);
@@ -52,7 +53,7 @@ public class SampleClassAuthorizationTests
         var user = CreateUserWithRoles("Manager");
 
         // Act
-        var canInsert = _authorization.Can(user, SampleClassAuthorization.Actions.Insert.Name);
+        var canInsert = _authorization.Can(user, TeamAuthorization.Actions.Insert);
 
         // Assert
         Assert.True(canInsert);
@@ -65,7 +66,7 @@ public class SampleClassAuthorizationTests
         var user = CreateUserWithRoles("User");
 
         // Act
-        var canInsert = _authorization.Can(user, SampleClassAuthorization.Actions.Insert.Name);
+        var canInsert = _authorization.Can(user, TeamAuthorization.Actions.Insert);
 
         // Assert
         Assert.False(canInsert);
@@ -78,7 +79,7 @@ public class SampleClassAuthorizationTests
         var user = CreateUserWithRoles("Manager");
 
         // Act
-        var canEdit = _authorization.Can(user, _sampleResource, SampleClassAuthorization.Actions.Edit.Name);
+        var canEdit = _authorization.Can(user, _sampleResource, TeamAuthorization.Actions.Edit);
 
         // Assert
         Assert.True(canEdit);
@@ -91,7 +92,7 @@ public class SampleClassAuthorizationTests
         var user = CreateUserWithRoles("Admin");
 
         // Act
-        var canEdit = _authorization.Can(user, _sampleResource, SampleClassAuthorization.Actions.Edit.Name);
+        var canEdit = _authorization.Can(user, _sampleResource, TeamAuthorization.Actions.Edit);
 
         // Assert
         Assert.True(canEdit);
@@ -104,7 +105,7 @@ public class SampleClassAuthorizationTests
         var user = CreateUserWithRoles("User");
 
         // Act
-        var canEdit = _authorization.Can(user, _sampleResource, SampleClassAuthorization.Actions.Edit.Name);
+        var canEdit = _authorization.Can(user, _sampleResource, TeamAuthorization.Actions.Edit);
 
         // Assert
         Assert.False(canEdit);
@@ -117,7 +118,7 @@ public class SampleClassAuthorizationTests
         var user = CreateUserWithRoles("Admin");
 
         // Act
-        var canDelete = _authorization.Can(user, _sampleResource, SampleClassAuthorization.Actions.Delete.Name);
+        var canDelete = _authorization.Can(user, _sampleResource, TeamAuthorization.Actions.Delete);
 
         // Assert
         Assert.True(canDelete);
@@ -131,7 +132,7 @@ public class SampleClassAuthorizationTests
         var user = CreateUserWithRoles("Manager");
 
         // Act
-        var canDelete = _authorization.Can(user, _sampleResource, SampleClassAuthorization.Actions.Delete.Name);
+        var canDelete = _authorization.Can(user, _sampleResource, TeamAuthorization.Actions.Delete);
 
         // Assert
         Assert.False(canDelete);
@@ -149,17 +150,55 @@ public class SampleClassAuthorizationTests
     }
 
     [Fact]
-    public void Can_StartMaintenance_With_InstanceAction_Should_Return_True_For_Maintainer()
+    public void Can_StartTraining_With_InstanceAction_Should_Return_True_For_Coach()
     {
         // Arrange
-        var identity = new GenericIdentity("Luigi");
-        var user = CreateUserWithRoles(identity);
+        var user = CreateUserWithNameAndRoles("Luigi");
 
         // Act
-        var canStartMaintenance = _authorization.Can(user, _sampleResource, SampleClassAuthorization.Actions.StartMaintenance.Name);
+        var canStartMaintenance = _authorization.Can(user, _sampleResource, TeamAuthorization.Actions.StartTraining);
 
         // Assert
         Assert.True(canStartMaintenance);
+    }
+
+    [Fact]
+    public void Can_Edit_Should_Return_True_For_User_With_Multiple_Roles()
+    {
+        // Arrange
+        var user = CreateUserWithRoles("User", "Manager");
+
+        // Act
+        var canEdit = _authorization.Can(user, _sampleResource, TeamAuthorization.Actions.Edit);
+
+        // Assert
+        Assert.True(canEdit);
+    }
+
+    [Fact]
+    public void Can_Insert_Should_Return_False_For_User_With_No_Roles()
+    {
+        // Arrange
+        var user = CreateUserWithRoles(); // No roles
+
+        // Act
+        var canInsert = _authorization.Can(user, TeamAuthorization.Actions.Insert);
+
+        // Assert
+        Assert.False(canInsert);
+    }
+
+    [Fact]
+    public void Can_StartTraining_Should_Return_False_For_Non_Coach()
+    {
+        // Arrange
+        var user = CreateUserWithNameAndRoles("Mario");
+
+        // Act
+        var canStartTraining = _authorization.Can(user, _sampleResource, TeamAuthorization.Actions.StartTraining);
+
+        // Assert
+        Assert.False(canStartTraining);
     }
 
     [Fact]
@@ -169,7 +208,7 @@ public class SampleClassAuthorizationTests
         var user = CreateUserWithRoles("Admin");
 
         // Act & Assert
-        Assert.Throws<InstanceActionException>(() => _authorization.Can(user, SampleClassAuthorization.Actions.Edit.Name));
+        Assert.Throws<InstanceActionException>(() => _authorization.Can(user, TeamAuthorization.Actions.Edit));
     }
 
     [Fact]
@@ -179,7 +218,7 @@ public class SampleClassAuthorizationTests
         var user = CreateUserWithRoles();
 
         // Act
-        var canRead = _authorization.Can(user, _sampleResource, SampleClassAuthorization.Actions.Read.Name);
+        var canRead = _authorization.Can(user, _sampleResource, TeamAuthorization.Actions.Read);
 
         // Assert
         Assert.True(canRead);
@@ -189,10 +228,10 @@ public class SampleClassAuthorizationTests
     public void Can_With_Null_User_Should_Throw_ArgumentNullException()
     {
         // Arrange
-        ClaimsPrincipal user = null;
+        ClaimsPrincipal? user = null;
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => _authorization.Can(user, SampleClassAuthorization.Actions.Read.Name));
+        Assert.Throws<ArgumentNullException>(() => _authorization.Can(user, TeamAuthorization.Actions.Read));
     }
 
     [Fact]
@@ -202,7 +241,7 @@ public class SampleClassAuthorizationTests
         var user = CreateUserWithRoles();
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => _authorization.Can(user, null));
+        Assert.Throws<ArgumentException>(() => _authorization.Can(user, null));
     }
 
     [Fact]
@@ -210,10 +249,12 @@ public class SampleClassAuthorizationTests
     {
         // Arrange
         var user = CreateUserWithRoles("Admin");
-        SampleClass resource = null;
+        Team? resource = null;
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => _authorization.Can(user, resource, SampleClassAuthorization.Actions.Edit.Name));
+#pragma warning disable CS8604 // Possible null reference argument.
+        Assert.Throws<ArgumentNullException>(() => _authorization.Can(user, resource, TeamAuthorization.Actions.Edit));
+#pragma warning restore CS8604 // Possible null reference argument.
     }
 
 }

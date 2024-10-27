@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AudrisAuth
+namespace AudrisAuth.Exceptions
 {
     /// <summary>
     /// Exception raised when an action is not recognized for a given type
@@ -9,7 +9,7 @@ namespace AudrisAuth
     public class NotRecognizedActionException : Exception
     {
         /// <summary>
-        /// Gets the type for withc the action was not recognized
+        /// Gets the type for witch the action was not recognized
         /// </summary>
         public Type ReferenceType { get; }
 

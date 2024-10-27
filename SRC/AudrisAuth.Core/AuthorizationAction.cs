@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AudrisAuth
 {
@@ -17,20 +15,29 @@ namespace AudrisAuth
         /// <summary>
         /// True if the action can be only applied at instance level
         /// </summary>
-        public bool IsInstanceAction { get; }  // True se può essere applicata a livello di istanza
+        public bool IsInstanceAction { get; }
+
+        /// <summary>
+        /// Rule to be applied to the action
+        /// </summary>
+        public string Rule { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthorizationAction"/> class.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="isInstanceAction"></param>
-        /// <exception cref="ArgumentException"></exception>
-        public AuthorizationAction(string name, bool isInstanceAction = false)
+        /// <exception cref="ArgumentException">If name or rule are null or empty</exception>
+        public AuthorizationAction(string name, string rule, bool isInstanceAction = false)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Action name cannot be null or empty", nameof(name));
 
+            if (string.IsNullOrWhiteSpace(rule))
+                throw new ArgumentException("Rule cannot be null or empty", nameof(rule));
+
             Name = name;
+            Rule = rule;
             IsInstanceAction = isInstanceAction;
         }
 
@@ -43,13 +50,15 @@ namespace AudrisAuth
         {
             return other != null &&
                    Name == other.Name &&
-                   IsInstanceAction == other.IsInstanceAction;
+                   IsInstanceAction == other.IsInstanceAction &&
+                   Rule == other.Rule;
         }
 
         public override int GetHashCode()
         {
             var hashCode = Name.GetHashCode();
             hashCode = hashCode * -1521134295 + IsInstanceAction.GetHashCode();
+            hashCode = hashCode * -1521134295 + Rule.GetHashCode();
             return hashCode;
         }
 

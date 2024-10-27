@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace AudrisAuth
+namespace AudrisAuth.Exceptions
 {
     /// <summary>
     /// Exception raised when an action for an instance is checked 

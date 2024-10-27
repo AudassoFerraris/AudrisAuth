@@ -1,8 +1,10 @@
 ﻿namespace AudrisAuth.Core.Tests.DefaultAuthorization;
+
 /// <summary>
 /// Class used for testing purposes as the reference type for the authorization
 /// </summary>
-public class SampleClass
+public class Team
 {
-    public bool IsMantainer(string username) => username == "Luigi";
+    public string Name { get; set; }
+    public Person Coach { get; set; }
 }
