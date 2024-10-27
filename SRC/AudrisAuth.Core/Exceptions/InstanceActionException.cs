@@ -18,6 +18,11 @@ namespace AudrisAuth.Exceptions
         /// </summary>
         public Type ReferenceType { get; }
 
+        /// <summary>
+        /// Constructor for the InstanceActionException
+        /// </summary>
+        /// <param name="referenceType"></param>
+        /// <param name="action"></param>
         public InstanceActionException(Type referenceType, string action) : base($"Action '{action}' cannot be checked without a specific instance of type {referenceType.Name}")
         {
             ReferenceType = referenceType;

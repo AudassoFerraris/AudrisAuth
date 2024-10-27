@@ -18,6 +18,11 @@ namespace AudrisAuth.Exceptions
         /// </summary>
         public string Action { get; }
 
+        /// <summary>
+        /// Constructor for the NotRecognizedActionException
+        /// </summary>
+        /// <param name="referenceType"></param>
+        /// <param name="action"></param>
         public NotRecognizedActionException(Type referenceType, string action) : base($"Action '{action}' not recognized for type '{referenceType.Name}'")
         {
             ReferenceType = referenceType;

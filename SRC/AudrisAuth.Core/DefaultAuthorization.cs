@@ -9,10 +9,29 @@ using DynamicExpresso;
 
 namespace AudrisAuth
 {
+    /// <summary>
+    /// Default authorization class that implements the IAuthorization interface.
+    /// Derive from this class to implement the authorization rules for a specific type.
+    /// </summary>
+    /// <typeparam name="T">Type to wich authorization is required</typeparam>
     public abstract class DefaultAuthorization<T> : IAuthorization<T>
     {
+        /// <summary>
+        /// Dictionary of available actions with their rules, accessible by name from derived classes.
+        /// </summary>
         protected readonly Dictionary<string, AuthorizationAction> _availableActions = new Dictionary<string, AuthorizationAction>();
 
+        /// <summary>
+        /// Check if user can perform a generic action
+        /// </summary>
+        /// <param name="user">User that requires to perform the action.</param>
+        /// <param name="action">Name of the action.</param>
+        /// <returns>True if the user is allowed to perform the action.</returns>
+        /// <exception cref="ArgumentNullException">If user is null</exception>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="NotRecognizedActionException"></exception>
+        /// <exception cref="InstanceActionException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
         // Implement the methods from IAuthorization<T>
         public bool Can(ClaimsPrincipal user, string action)
         {
@@ -40,6 +59,25 @@ namespace AudrisAuth
             }
         }
 
+        /// <summary>
+        /// Check if user can perform a specific action on an instance of resource type T
+        /// </summary>
+        /// <param name="user">
+        /// The user that requires to perform the action.
+        /// </param>
+        /// <param name="resource">
+        /// The resource on which the action is to be performed.
+        /// </param>
+        /// <param name="action">
+        /// The action to be performed.
+        /// </param>
+        /// <returns>
+        /// True if the user is allowed to perform the action.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="NotRecognizedActionException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
         public bool Can(ClaimsPrincipal user, T resource, string action)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
@@ -67,6 +105,10 @@ namespace AudrisAuth
             }
         }
 
+        /// <summary>
+        /// Get the list of available actions for the resource type T
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<AuthorizationAction> GetAvailableActions()
         {
             return _availableActions.Values;
@@ -119,11 +161,23 @@ namespace AudrisAuth
             
         }
 
+        /// <summary>
+        /// Function used to extract the user id from the claims.
+        /// Can be overridden in derived classes to extract the user id from a different claim.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>The first value for a NameIdentifier claim</returns>
         protected virtual string GetUserId(ClaimsPrincipal user)
         {
             return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
 
+        /// <summary>
+        /// Function used to extract the claims from the user.
+        /// Can be overridden in derived classes to extract the claims in a different way.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         protected virtual Dictionary<string, List<string>> GetClaims(ClaimsPrincipal user)
         {
             return user.Claims
@@ -131,6 +185,12 @@ namespace AudrisAuth
                 .ToDictionary(g => g.Key, g => g.Select(c => c.Value).ToList());
         }
 
+        /// <summary>
+        /// Function used to extract the roles from the user.
+        /// Can be overridden in derived classes to extract the roles in a different way.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>The list of roles from the values of claims of type Role</returns>
         protected virtual string[] GetUserRoles(ClaimsPrincipal user)
         {
             return user.Claims
@@ -139,7 +199,13 @@ namespace AudrisAuth
                 .ToArray();
         }
 
-        // Method to add a generic rule
+        /// <summary>
+        /// Add a generic rule for an action to the available actions.
+        /// Generic rules can be checked without an instance of T.
+        /// </summary>
+        /// <param name="actionName"></param>
+        /// <param name="ruleText"></param>
+        /// <exception cref="ArgumentException"></exception>
         protected void AddGenericRule(string actionName, string ruleText)
         {
             if (string.IsNullOrWhiteSpace(actionName))
@@ -152,7 +218,12 @@ namespace AudrisAuth
             _availableActions[actionName] = action;
         }
 
-        // Method to add an instance rule
+        /// <summary>
+        /// Add a rule for an action that requires an instance of T to be checked.
+        /// </summary>
+        /// <param name="actionName"></param>
+        /// <param name="ruleText"></param>
+        /// <exception cref="ArgumentException"></exception>
         protected void AddInstanceRule(string actionName, string ruleText)
         {
             if (string.IsNullOrWhiteSpace(actionName))

@@ -11,11 +11,7 @@ public class TeamAuthorizationTests
     public TeamAuthorizationTests()
     {
         _authorization = new TeamAuthorization();
-        _sampleResource = new Team
-        {
-            Name = "Black Bugs",
-            Coach = new Person { Name = "Luigi" }
-        };
+        _sampleResource = new Team("Black Dogs", new Person("Luigi"));
     }
 
     private ClaimsPrincipal CreateUserWithRoles(params string[] roles)

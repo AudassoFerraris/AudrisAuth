@@ -5,6 +5,21 @@
 /// </summary>
 public class Team
 {
-    public string Name { get; set; }
-    public Person Coach { get; set; }
+    public string Name { get; set; } = null!;
+
+    public Person Coach { get; set; } = null!;
+
+    public Team(string name, Person coach)
+    {
+        if (name == null)
+        {
+            throw new ArgumentNullException(nameof(name));
+        }
+        if (coach == null)
+        {
+            throw new ArgumentNullException(nameof(coach));
+        }
+        Name = name;
+        Coach = coach;
+    }
 }

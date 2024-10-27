@@ -25,8 +25,9 @@ namespace AudrisAuth
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthorizationAction"/> class.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="isInstanceAction"></param>
+        /// <param name="name">name of the action</param>
+        /// <param name="rule">rule for this action</param>
+        /// <param name="isInstanceAction">if true the action can be checked against a value of T</param>
         /// <exception cref="ArgumentException">If name or rule are null or empty</exception>
         public AuthorizationAction(string name, string rule, bool isInstanceAction = false)
         {
@@ -41,11 +42,21 @@ namespace AudrisAuth
             IsInstanceAction = isInstanceAction;
         }
 
+        /// <summary>
+        /// Check if the object is equal to this instance of AuthorizationAction
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override bool Equals(object obj)
         {
             return Equals(obj as AuthorizationAction);
         }
 
+        /// <summary>
+        /// Equality check for the AuthorizationAction class based on the Name, IsInstanceAction and Rule properties
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public bool Equals(AuthorizationAction other)
         {
             return other != null &&
@@ -54,6 +65,10 @@ namespace AudrisAuth
                    Rule == other.Rule;
         }
 
+        /// <summary>
+        /// Override of the GetHashCode method for the AuthorizationAction class
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             var hashCode = Name.GetHashCode();
@@ -62,6 +77,10 @@ namespace AudrisAuth
             return hashCode;
         }
 
+        /// <summary>
+        /// Override of the ToString method for the AuthorizationAction class
+        /// </summary>
+        /// <returns>The name property</returns>
         public override string ToString() => Name;
     }
 

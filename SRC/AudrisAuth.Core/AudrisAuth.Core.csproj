@@ -17,13 +17,21 @@
     <NeutralLanguage>en</NeutralLanguage>
     <Company>Audris snc di Audasso Margherita e Ferraris Roberto</Company>
     <Description>An extensible and flexible authorization library for .NET applications.</Description>
-    <PackageTags>authorization;dynamic;security</PackageTags>
-    <RepositoryUrl>https://github.com/AudassoFerraris/AudrisAuth</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/AudassoFerraris/AudrisAuth</PackageProjectUrl>
-    <LicenseType>MIT</LicenseType>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
+  <PropertyGroup>
+    <PackageTags>authorization;dynamic;security</PackageTags>
+	  <LicenseType>MIT</LicenseType>
+	  <RepositoryUrl>https://github.com/AudassoFerraris/AudrisAuth</RepositoryUrl>
+	  <RepositoryType>git</RepositoryType>
+	  <PackageProjectUrl>https://github.com/AudassoFerraris/AudrisAuth</PackageProjectUrl>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath=""/>
+  </ItemGroup>
 
   <PropertyGroup>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
